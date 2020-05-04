@@ -47,11 +47,11 @@ module.exports = {
     getUserFromJwt: async (req, res) => {
         logger.debug('getUserFromJwt()')
         if (!req.headers['authorization']) {
-            return { status: 401, body: { Error: "Authentification requise" }  }
+            return { status: 401, body: { error: "Authentification requise" }  }
         }
         let user = await module.exports.getUser(req.headers['authorization'])
         if (!user) {
-            return { status: 401, body: { Error: "Token invalide" }  }
+            return { status: 401, body: { error: "Token invalide" }  }
         }
         let userFound = await models.User.findOne({
             where: {
@@ -59,7 +59,7 @@ module.exports = {
             }
         })
         if (!userFound) {
-            return { status: 404, body: { Error: "Utilisateur non trouvé" }  }
+            return { status: 404, body: { error: "Utilisateur non trouvé" }  }
         }
         return { status: 200, body: user  }
     }

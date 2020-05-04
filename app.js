@@ -23,6 +23,8 @@ app.get('/', (req, res) => {
     return res.sendStatus(200)
 })
 
+app.use('/users', require('./routes/users'))
+
 app.use((req, res) => {
     let err = new Error('Not Found')
     err.status = 404
