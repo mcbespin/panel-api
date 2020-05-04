@@ -1,0 +1,14 @@
+# IDE configuration
+.idea/
+.vscode/
+*.code-workspace
+*.iml
+
+# OS files
+.DS_Store
+.env
+
+# Node
+node_modules/
+package-lock.json
+yarn.lock

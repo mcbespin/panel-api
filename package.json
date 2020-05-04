@@ -1,0 +1,13 @@
+{
+  "name": "panel-api",
+  "version": "1.0.0",
+  "main": "app.js",
+  "author": {
+    "name": "Alexandre",
+    "email": "contact@acanoen.fr",
+    "url": "https://acanoen.fr"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {},
+  "devDependencies": {}
+}
