@@ -24,6 +24,8 @@ app.get('/', (req, res) => {
 })
 
 app.use('/users', require('./routes/users'))
+app.use('/servers', require('./routes/servers'))
+app.use('/actions', require('./routes/actions'))
 
 app.use((req, res) => {
     let err = new Error('Not Found')
