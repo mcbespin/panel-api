@@ -10,7 +10,7 @@ module.exports = {
     */
     return queryInterface.bulkInsert('Servers', [{
       name: 'Dev Server',
-      path: '/Users/alexc/Desktop/serveur/',
+      path: '/Users/alexc/Labo/serveur/',
       isProxy: false
     }], {});
   },
