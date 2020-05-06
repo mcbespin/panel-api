@@ -1,7 +1,8 @@
 const logger = require('../helpers/logger')
 const jwt = require('../helpers/jwt')
 const models = require('../database/models')
-const cp = require('child_process')
+const fs = require('fs')
+const { exec } = require('child_process')
 
 module.exports = {
 
@@ -15,6 +16,19 @@ module.exports = {
             }
         })
         if (!server) return res.sendStatus(404)
+        const shellScript = exec(`cd ${server.path} && ./start.sh status`)
+        shellScript.stdout.on('data', data => {
+            res.status(200).json({
+                message: data.replace('\n', '')
+            })
+            res.end()
+        })
+        shellScript.stderr.on('data', data => {
+            res.status(500).json({
+                error: data
+            })
+            res.end()
+        })
     },
 
     logs_server: async (req, res) => {
@@ -27,6 +41,8 @@ module.exports = {
             }
         })
         if (!server) return res.sendStatus(404)
+        let file = fs.readFileSync(`${server.path}/logs/latest.log`)
+        res.status(200).send(file)
     },
 
     start_server: async (req, res) => {
@@ -39,6 +55,19 @@ module.exports = {
             }
         })
         if (!server) return res.sendStatus(404)
+        const shellScript = exec(`cd ${server.path} && ./start.sh start`)
+        shellScript.stdout.on('data', data => {
+            res.status(200).json({
+                message: 'Le serveur est en cours de démarrage.'
+            })
+            res.end()
+        })
+        shellScript.stderr.on('data', data => {
+            res.status(500).json({
+                error: data
+            })
+            res.end()
+        })
     },
 
     stop_server: async (req, res) => {
@@ -51,6 +80,19 @@ module.exports = {
             }
         })
         if (!server) return res.sendStatus(404)
+        const shellScript = exec(`cd ${server.path} && ./start.sh stop`)
+        shellScript.stdout.on('data', data => {
+            res.status(200).json({
+                message: 'Le serveur est en cours d\'arrêt.'
+            })
+            res.end()
+        })
+        shellScript.stderr.on('data', data => {
+            res.status(500).json({
+                error: data
+            })
+            res.end()
+        })
     },
 
     command_server: async (req, res) => {
@@ -64,6 +106,19 @@ module.exports = {
         })
         if (!server) return res.sendStatus(404)
         if (!req.body.command) return res.sendStatus(412)
+        const shellScript = exec(`cd ${server.path} && ./start.sh command ${req.body.command}`)
+        shellScript.stdout.on('data', data => {
+            res.status(200).json({
+                message: 'La commande a bien été éxécutée sur le serveur.'
+            })
+            res.end()
+        })
+        shellScript.stderr.on('data', data => {
+            res.status(500).json({
+                error: data
+            })
+            res.end()
+        })
     }
 
 }
