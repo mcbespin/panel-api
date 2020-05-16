@@ -63,7 +63,7 @@ module.exports = {
         logger.debug('delete_server()')
         let resp = await jwt.getUserFromJwt(req, res)
         if (resp.status > 400 || !resp.body.isAdmin) return res.sendStatus(401)
-        await models.Server.delete({
+        await models.Server.destroy({
             where: {
                 id: req.params.id
             }
