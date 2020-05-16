@@ -31,7 +31,7 @@ module.exports = {
         logger.debug('create_server()')
         let resp = await jwt.getUserFromJwt(req, res)
         if (resp.status > 400 || !resp.body.isAdmin) return res.sendStatus(401)
-        if (!req.body.name || !req.body.path || !req.body.isProxy) return res.sendStatus(412)
+        if (!req.body.name || !req.body.path || req.body.isProxy === undefined) return res.sendStatus(412)
         let server = await models.Server.create({
             name: req.body.name,
             path: req.body.path,
