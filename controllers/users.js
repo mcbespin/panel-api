@@ -20,6 +20,27 @@ module.exports = {
     },
 
     /**
+     * Get users list (if admin)
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*|Json|Format>}
+     */
+    get_users: async (req, res) => {
+        logger.debug('get_users()')
+        let response = await JWT.getUserFromJwt(req, res)
+        if (response.statusCode >= 400) {
+            return res.status(response.status).json(response.body)
+        }
+        if (!response.body.isAdmin) {
+            return res.status(401).json({ error: 'L\'utilisateur n\'a pas les privilèges d\'administrateur.' })
+        }
+        let users = await models.User.findAll()
+        res.status(200).json(users)
+        res.end()
+    },
+
+    /**
      * Update profile information
      *
      * @param req
@@ -43,7 +64,7 @@ module.exports = {
             password: req.body.newPassword ? bcrypt.hashSync(req.body.newPassword, 10) : response.body.password
         }, {
             where: {
-                Id: response.body.id
+                id: response.body.id
             }
         })
         return res.status(200).json({
@@ -65,14 +86,13 @@ module.exports = {
                 error: 'Paramètres manquants (nom d\'utilisateur et/ou mot de passe).'
             })
         }
-        let userFound = await models.User.findOne({ where: { name: req.body.username } }) || await models.User.findOne({ where: { email: req.body.username } })
+        let userFound = await models.User.findOne({ where: { name: req.body.username, isActive: true } }) || await models.User.findOne({ where: { email: req.body.username, isActive: true } })
         if (userFound === null) {
             return res.status(404).json({
                 error: 'Utilisateur non trouvé.'
             })
         } else {
-            let result = bcrypt.compareSync(req.body.password, userFound.password)
-            if (!result) {
+            if (!bcrypt.compareSync(req.body.password, userFound.password)) {
                 return res.status(412).json({
                     error: 'Mot de passe invalide.'
                 })
@@ -86,15 +106,15 @@ module.exports = {
         }
     },
 
-    /**
-     * Register an account
-     *
-     * @param req
-     * @param res
-     * @returns {Promise<void>}
-     */
-    post_register: async (req, res) => {
-        logger.debug('post_register()')
+    create_user: async (req, res) => {
+        logger.debug('create_user()')
+        let response = await JWT.getUserFromJwt(req, res)
+        if (response.statusCode >= 400) {
+            return res.status(response.status).json(response.body)
+        }
+        if (!response.body.isAdmin) {
+            return res.status(401).json({ error: 'L\'utilisateur n\'a pas les privilèges d\'administrateur.' })
+        }
         if (req.body.name === undefined || req.body.email === undefined || req.body.password === undefined) {
             return res.status(412).json({
                 error: 'Paramètres manquants (nom d\'utilisateur et/ou adresse e-mail et/ou mot de passe).'
@@ -132,6 +152,45 @@ module.exports = {
                 user: user
             })
         }
+    },
+
+    update_user: async (req, res) => {
+        logger.debug('update_user()')
+        let response = await JWT.getUserFromJwt(req, res)
+        if (response.statusCode >= 400) {
+            return res.status(response.status).json(response.body)
+        }
+        if (!response.body.isAdmin) {
+            return res.status(401).json({ error: 'L\'utilisateur n\'a pas les privilèges d\'administrateur.' })
+        }
+        if (req.body.newPassword) req.body.password = bcrypt.hashSync(req.body.newPassword, 10)
+        await models.User.update(req.body, {
+            where: {
+                id: req.params.id
+            }
+        })
+        return res.status(200).json({
+            message: "Utilisateur mis à jour avec succès."
+        })
+    },
+
+    delete_user: async (req, res) => {
+        logger.debug('delete_user()')
+        let response = await JWT.getUserFromJwt(req, res)
+        if (response.statusCode >= 400) {
+            return res.status(response.status).json(response.body)
+        }
+        if (!response.body.isAdmin) {
+            return res.status(401).json({ error: 'L\'utilisateur n\'a pas les privilèges d\'administrateur.' })
+        }
+        await models.User.destroy({
+            where: {
+                id: req.params.id
+            }
+        })
+        return res.status(200).json({
+            message: "Utilisateur supprimé avec succès."
+        })
     }
 
 }
