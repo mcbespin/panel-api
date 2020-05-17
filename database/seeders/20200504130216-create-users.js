@@ -14,7 +14,8 @@ module.exports = {
       name: 'Alex62_',
       email: 'contact@acanoen.fr',
       password: bcrypt.hashSync('toto', 10),
-      isAdmin: true
+      isAdmin: true,
+      isActive: true
     }], {});
   },
 
