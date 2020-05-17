@@ -163,7 +163,12 @@ module.exports = {
         if (!response.body.isAdmin) {
             return res.status(401).json({ error: 'L\'utilisateur n\'a pas les privilèges d\'administrateur.' })
         }
-        if (req.body.newPassword) req.body.password = bcrypt.hashSync(req.body.newPassword, 10)
+        if (typeof req.body.password === 'string' && req.body.password.length > 0) {
+            req.body.password = bcrypt.hashSync(req.body.password, 10)
+        }
+        if (req.body.password === '' || req.body.password === undefined) {
+            delete req.body.password
+        }
         await models.User.update(req.body, {
             where: {
                 id: req.params.id
